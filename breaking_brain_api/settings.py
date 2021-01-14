@@ -18,7 +18,7 @@ from environs import Env
 
 
 env = Env()
-env.read_env()
+env.read_env('.env/vars')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,6 +43,8 @@ AUTH_USER_MODEL = 'authentication.User'
 # Application definition
 
 INSTALLED_APPS = [
+    'authentication',
+
     'rest_framework',
     'corsheaders',
     'drf_yasg',
@@ -141,7 +143,7 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
-DJANGO_LOGFILE_NAME = env.str('DJANGO_LOG_PATH', os.path.join(BASE_DIR, '.data/django/choose_one.log'))
+DJANGO_LOGFILE_NAME = env.str('DJANGO_LOG_PATH', os.path.join(BASE_DIR, '.data/django/breaking_brain_api.log'))
 LOGFILE_SIZE = 5 * 1024 * 1024
 
 CELERY_LOGFILE_NAME = env.str('CELERY_LOG_PATH', os.path.join(BASE_DIR, '.data/django/celery.log'))
