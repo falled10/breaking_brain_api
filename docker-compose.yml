@@ -13,7 +13,7 @@ services:
       - redis
   celery:
     build: .
-    command: celery -A choose_one worker -l info
+    command: celery -A breaking_brain_api worker -l info
     env_file:
       - .env/vars
     entrypoint: ""
@@ -24,7 +24,7 @@ services:
       - api
   celery_beat:
     build: .
-    command: celery -A choose_one beat -l info
+    command: celery -A breaking_brain_api beat -l info
     env_file:
       - .env/vars
     entrypoint: ""

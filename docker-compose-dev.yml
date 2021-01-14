@@ -1,8 +1,7 @@
 version: '3'
 services:
   postgres:
-    image: postgres:latest
-    restart: always
+    image: postgres:12
     env_file:
       - .env/vars
     ports:
