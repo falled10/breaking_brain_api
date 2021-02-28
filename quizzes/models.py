@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models.fields import related
 
 
 class Quiz(models.Model):
@@ -16,7 +15,7 @@ class Quiz(models.Model):
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
-    lable = models.CharField(max_length=255)
+    label = models.CharField(max_length=255)
 
     class Meta:
         db_table = 'questions'
