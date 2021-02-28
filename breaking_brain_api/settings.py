@@ -44,10 +44,12 @@ AUTH_USER_MODEL = 'authentication.User'
 
 INSTALLED_APPS = [
     'authentication',
+    'quizzes',
 
     'rest_framework',
     'corsheaders',
     'drf_yasg',
+    'nested_inline',
 
     'django.contrib.admin',
     'django.contrib.auth',
