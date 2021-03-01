@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.4.0 - UNRELEASED
+
+### Added
+
+* Tag model
+* User M2M relation with Tag model 
+* Quiz M2M relation with Tag model 
+
 ## v0.3.0 - 01.03.2021
 
 ### Added
