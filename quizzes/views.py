@@ -20,6 +20,9 @@ class QuizViewSet(ReadOnlyModelViewSet):
     """
 
     serializer_class = QuizSerializer
-    queryset = Quiz.objects.all()
     permission_classes = (AllowAny,)
     pagination_class = ResultSetPagination
+
+
+    def get_queryset(self):
+        return Quiz.objects.all().prefetch_related('tags', 'questions__options')

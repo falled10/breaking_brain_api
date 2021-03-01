@@ -3,6 +3,8 @@ from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from quizzes.models import Tag
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, username, password=None):
@@ -60,6 +62,8 @@ class User(AbstractBaseUser, PermissionsMixin):
                                                    'explicitly assigning them.'),
                                        verbose_name=_('is superuser'))
     username = models.CharField(max_length=255, unique=True)
+
+    tags = models.ManyToManyField(Tag, related_name='users')
 
     date_joined = models.DateTimeField(auto_now_add=True, verbose_name=_('date joined'))
 

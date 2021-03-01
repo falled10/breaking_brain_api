@@ -1,6 +1,13 @@
 from rest_framework import serializers
 
-from quizzes.models import Question, Quiz, Option
+from quizzes.models import Question, Quiz, Option, Tag
+
+
+class TagSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Tag
+        fields = ('id', 'label')
 
 
 class OptionSerializer(serializers.ModelSerializer):
@@ -20,7 +27,8 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class QuizSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
 
     class Meta:
         model = Quiz
-        fields = ('id', 'title', 'description', 'questions')
+        fields = ('id', 'title', 'description', 'questions', 'tags')
