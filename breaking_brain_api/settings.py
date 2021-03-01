@@ -45,6 +45,7 @@ AUTH_USER_MODEL = 'authentication.User'
 INSTALLED_APPS = [
     'authentication',
     'quizzes',
+    'users',
 
     'rest_framework',
     'corsheaders',
