@@ -1,26 +1,34 @@
 # CHANGELOG
 
 
+## v0.4.0 - 17.03.2021
+
+### Features
+
+* Tag model
+* User M2M relation with Tag model 
+* Quiz M2M relation with Tag model 
+
 ## v0.3.0 - 01.03.2021
 
-### Added
+### Features
 
 * Forget and change password functionality
 
 ## v0.2.0 - 28.02.2021
 
-### Added
+### Features
 
 * Quiz, Question, Option models
 * Quiz views
 
-### Removed
+### Improvements
 
-* Redudant celery signal
+* Removed Redudant celery signal
 
 ## v0.1.0 - 14.01.2021
 
-### Added
+### Features
 
 * Initialize project
 * Sign Up logic

@@ -1,9 +1,21 @@
 from django.db import models
 
 
+class Tag(models.Model):
+    label = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'tags'
+
+    def __str__(self):
+        return self.label
+
+
 class Quiz(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
+    tags = models.ManyToManyField(Tag, related_name='quizzes')
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
