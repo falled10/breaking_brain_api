@@ -1,7 +1,7 @@
 # CHANGELOG
 
 
-## v0.4.0 - UNRELEASED
+## v0.4.0 - 17.03.2021
 
 ### Features
 
