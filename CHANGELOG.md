@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.5.0 - UNRELEASED
+
+### Features
+
+* Added lessons model
 
 ## v0.4.0 - 17.03.2021
 
