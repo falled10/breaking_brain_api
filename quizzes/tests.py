@@ -21,10 +21,6 @@ class QuizTest(BaseAPITest):
         self.assertEqual(resp.data['results'][0]['title'], self.quiz.title)
         self.assertEqual(resp.data['results'][0]['lessons'][0]['id'], self.lesson.id)
         self.assertEqual(resp.data['results'][0]['lessons'][0]['title'], self.lesson.title)
-        self.assertEqual(resp.data['results'][0]['questions'][0]['id'],
-                         self.quiz.id)
-        self.assertEqual(resp.data['results'][0]['questions'][0]['options'][0]['id'],
-                         self.option.id)
 
     def test_get_single_quiz(self):
         resp = self.client.get(reverse('quizzes-detail', args=(self.quiz.id,)))
@@ -33,10 +29,6 @@ class QuizTest(BaseAPITest):
         self.assertEqual(resp.data['title'], self.quiz.title)
         self.assertEqual(resp.data['lessons'][0]['id'],
                          self.lesson.id)
-        self.assertEqual(resp.data['questions'][0]['id'],
-                         self.quiz.id)
-        self.assertEqual(resp.data['questions'][0]['options'][0]['id'],
-                         self.option.id)
 
     def test_get_non_existed_quiz(self):
         resp = self.client.get(reverse('quizzes-detail', args=(123123,)))
