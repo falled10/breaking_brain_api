@@ -5,6 +5,7 @@
 ### Features
 
 * Added lessons model
+* Added questions action
 
 ## v0.4.0 - 17.03.2021
 
