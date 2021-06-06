@@ -31,7 +31,6 @@ class QuizViewSet(ReadOnlyModelViewSet):
     permission_classes = (AllowAny,)
     pagination_class = ResultSetPagination
 
-
     def get_queryset(self):
         return Quiz.objects.all().prefetch_related('tags', 'lessons')
 
