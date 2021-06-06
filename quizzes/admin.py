@@ -1,7 +1,7 @@
 from django.contrib import admin
 from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 
-from quizzes.models import Quiz, Question, Option, Tag
+from quizzes.models import Quiz, Question, Option, Tag, Lesson
 
 
 class OptionInline(NestedTabularInline):
@@ -23,4 +23,9 @@ class QuizAdmin(NestedModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Lesson)
+class LessonAdmin(admin.ModelAdmin):
     pass

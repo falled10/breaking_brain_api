@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'nested_inline',
+    'django_elasticsearch_dsl',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -197,6 +198,12 @@ LOGGING = {
             'propagate': True,
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
+    },
+}
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': env.str('ELASTICSEARCH_URL', 'localhost:9200')
     },
 }
 

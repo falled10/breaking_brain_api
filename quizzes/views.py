@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -6,6 +7,7 @@ from rest_framework.decorators import action
 
 from breaking_brain_api.paginators import ResultSetPagination
 from quizzes.models import Quiz
+from quizzes.search import get_search_query
 from quizzes.serializers import QuestionSerializer, QuizSerializer
 
 
@@ -33,6 +35,8 @@ class QuizViewSet(ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Quiz.objects.all().prefetch_related('tags', 'lessons')
+
+    # TODO: search action that supports pagination for elasticsearch
 
     @action(detail=True, methods=['GET'], serializer_class=QuestionSerializer,
             permission_classes=(IsAuthenticated,))
