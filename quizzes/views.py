@@ -1,4 +1,4 @@
-from django_filters.rest_framework import DjangoFilterBackend
+from django.conf import settings
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -36,7 +36,18 @@ class QuizViewSet(ReadOnlyModelViewSet):
     def get_queryset(self):
         return Quiz.objects.all().prefetch_related('tags', 'lessons')
 
-    # TODO: search action that supports pagination for elasticsearch
+    @action(detail=False, methods=["GET"])
+    def search(self, request, *args, **kwargs):
+        q = request.GET.get('q')
+        try:
+            page = int(request.GET.get('page', 1))
+            page_size = int(request.GET.get('page_size', settings.PAGE_SIZE))
+            if q:
+                data = get_search_query(q, page, page_size).to_queryset()
+                return Response(data=self.get_serializer_class()(data, many=True).data)
+        except TypeError:
+            pass
+        return Response(data=[])
 
     @action(detail=True, methods=['GET'], serializer_class=QuestionSerializer,
             permission_classes=(IsAuthenticated,))
