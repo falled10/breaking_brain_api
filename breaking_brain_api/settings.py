@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'authentication',
     'quizzes',
     'users',
+    'search',
 
     'rest_framework',
     'corsheaders',
@@ -206,6 +207,9 @@ ELASTICSEARCH_DSL = {
         'hosts': env.str('ELASTICSEARCH_URL', 'localhost:9200')
     },
 }
+
+ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = env.str('ELASTICSEARCH_DSL_SIGNAL_PROCESSOR',
+                                             'search.signals.FakeSignalProcessor')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (

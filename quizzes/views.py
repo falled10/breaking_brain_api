@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 
 from breaking_brain_api.paginators import ResultSetPagination
 from quizzes.models import Quiz
-from quizzes.search import get_search_query
+from search.utils import search_quizzes
 from quizzes.serializers import QuestionSerializer, QuizSerializer
 
 
@@ -43,7 +43,7 @@ class QuizViewSet(ReadOnlyModelViewSet):
             page = int(request.GET.get('page', 1))
             page_size = int(request.GET.get('page_size', settings.PAGE_SIZE))
             if q:
-                data = get_search_query(q, page, page_size).to_queryset()
+                data = search_quizzes(q, page, page_size).to_queryset()
                 return Response(data=self.get_serializer_class()(data, many=True).data)
         except TypeError:
             pass
