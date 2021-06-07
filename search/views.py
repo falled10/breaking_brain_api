@@ -10,7 +10,7 @@ from search.utils import search_lessons, search_quizzes
 class SearchView(APIView):
     permission_classes = (AllowAny,)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # TODO: schema for get method and query params
         q = request.GET.get('q', '')
         data = {
             'lessons': LessonSerializer(search_lessons(q).to_queryset(), many=True).data,
