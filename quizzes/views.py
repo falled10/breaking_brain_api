@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -6,6 +7,7 @@ from rest_framework.decorators import action
 
 from breaking_brain_api.paginators import ResultSetPagination
 from quizzes.models import Quiz
+from search.utils import search_quizzes
 from quizzes.serializers import QuestionSerializer, QuizSerializer
 
 
@@ -23,7 +25,7 @@ class QuizViewSet(ReadOnlyModelViewSet):
 
     questions:
     Get list of questions for single quiz
-    
+
     Get list of questions for single quiz
     """
 
@@ -33,6 +35,19 @@ class QuizViewSet(ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Quiz.objects.all().prefetch_related('tags', 'lessons')
+
+    @action(detail=False, methods=["GET"])
+    def search(self, request, *args, **kwargs):
+        q = request.GET.get('q')
+        try:
+            page = int(request.GET.get('page', 1))
+            page_size = int(request.GET.get('page_size', settings.PAGE_SIZE))
+            if q:
+                data = search_quizzes(q, page, page_size).to_queryset()
+                return Response(data=self.get_serializer_class()(data, many=True).data)
+        except TypeError:
+            pass
+        return Response(data=[])
 
     @action(detail=True, methods=['GET'], serializer_class=QuestionSerializer,
             permission_classes=(IsAuthenticated,))

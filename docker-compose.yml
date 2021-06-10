@@ -11,6 +11,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - elasticsearch
   celery:
     build: .
     command: celery -A breaking_brain_api worker -l info
@@ -46,6 +47,14 @@ services:
       - .env/vars
     volumes:
       - ./.data/redis:/data
+  elasticsearch:
+    image: elasticsearch:7.13.1
+    env_file:
+      - .env/vars
+    environment:
+      - discovery.type=single-node
+    volumes:
+      - ./.data/elasticsearch:/usr/share/elasticsearch/data
   nginx:
     image: nginx:latest
     restart: always
