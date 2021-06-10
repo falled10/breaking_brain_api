@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.5.0 - UNRELEASED
+
+### Features
+
+* Added lessons model
+* Added questions action
+* Added elasticsearch
 
 ## v0.4.0 - 17.03.2021
 

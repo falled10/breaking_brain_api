@@ -46,11 +46,13 @@ INSTALLED_APPS = [
     'authentication',
     'quizzes',
     'users',
+    'search',
 
     'rest_framework',
     'corsheaders',
     'drf_yasg',
     'nested_inline',
+    'django_elasticsearch_dsl',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -200,6 +202,15 @@ LOGGING = {
     },
 }
 
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': env.str('ELASTICSEARCH_URL', 'localhost:9200')
+    },
+}
+
+ELASTICSEARCH_DSL_SIGNAL_PROCESSOR = env.str('ELASTICSEARCH_DSL_SIGNAL_PROCESSOR',
+                                             'search.signals.FakeSignalProcessor')
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -289,3 +300,6 @@ PASSWORD_RESET_URL = env.str('PASSWORD_RESET_URL', 'http://localhost')
 MAILJET_PUBLIC_KEY = env.str('MAILJET_PUBLIC_KEY', '')
 MAILJET_SECRET_KEY = env.str('MAILJET_SECRET_KEY', '')
 MAILJET_USER = env.str('MAILJET_USER', '')
+
+
+PAGE_SIZE = 20

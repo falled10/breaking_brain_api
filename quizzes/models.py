@@ -41,3 +41,15 @@ class Option(models.Model):
     class Meta:
         db_table = 'options'
         unique_together = ['question', 'is_right']
+
+
+class Lesson(models.Model):
+    title = models.CharField(max_length=255)
+    body = models.TextField()
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='lessons')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'lessons'

@@ -1,34 +1,33 @@
 from rest_framework import serializers
 
-from quizzes.models import Question, Quiz, Option, Tag
+
+class LessonSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField()
+    body = serializers.CharField()
+    updated_at = serializers.DateTimeField()
 
 
-class TagSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Tag
-        fields = ('id', 'label')
+class TagSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    label = serializers.CharField()
 
 
-class OptionSerializer(serializers.ModelSerializer):
+class OptionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    label = serializers.CharField()
+    is_right = serializers.BooleanField()
 
-    class Meta:
-        model = Option
-        fields = ('id', 'label', 'is_right')
 
-
-class QuestionSerializer(serializers.ModelSerializer):
+class QuestionSerializer(serializers.Serializer):
     options = OptionSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Question
-        fields = ('id', 'label', 'options')
+    id = serializers.IntegerField()
+    label = serializers.CharField()
 
 
-class QuizSerializer(serializers.ModelSerializer):
-    questions = QuestionSerializer(many=True, read_only=True)
+class QuizSerializer(serializers.Serializer):
     tags = TagSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Quiz
-        fields = ('id', 'title', 'description', 'questions', 'tags')
+    lessons = LessonSerializer(many=True, read_only=True)
+    id = serializers.IntegerField()
+    title = serializers.CharField()
+    description = serializers.CharField()
