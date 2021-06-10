@@ -25,7 +25,7 @@ class QuizViewSet(ReadOnlyModelViewSet):
 
     questions:
     Get list of questions for single quiz
-    
+
     Get list of questions for single quiz
     """
 

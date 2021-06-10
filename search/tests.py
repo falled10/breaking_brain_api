@@ -10,7 +10,7 @@ class TestSearch(BaseAPITest):
 
     def setUp(self):
         self.quiz = mixer.blend(Quiz, title='something')
-        self.other_quiz = mixer.blend(Quiz)
+        self.other_quiz = mixer.blend(Quiz, title='other-thing')
         self.lesson = mixer.blend(Lesson, quiz=self.other_quiz, title='something')
         registry.update(self.quiz)
         registry.update(self.lesson)
@@ -27,7 +27,7 @@ class TestSearch(BaseAPITest):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['lessons'][0]['id'], self.lesson.id)
         self.assertEqual(resp.data['lessons'][0]['title'], self.lesson.title)
-        self.assertEqual(resp.data['quizzes'][0]['title'], self.quiz.title)
+        self.assertEqual(resp.data['quizzes'][1]['title'], self.quiz.title)
 
     def test_search_by_all_indexes_when_query_is_worong(self):
         url = f"{reverse('search')}?q=else"

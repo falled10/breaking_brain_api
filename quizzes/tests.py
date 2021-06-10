@@ -71,14 +71,14 @@ class QuizTest(BaseAPITest):
     def test_get_non_existed_quiz(self):
         resp = self.client.get(reverse('quizzes-detail', args=(123123,)))
         self.assertEqual(resp.status_code, 404)
-    
+
     def test_get_questions_from_quiz(self):
         resp = self.client.get(reverse('quizzes-questions', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data[0]['id'], self.question.id)
         self.assertEqual(resp.data[0]['options'][0]['id'], self.option.id)
         self.assertEqual(len(resp.data), 1)
-    
+
     def test_get_quesionts_from_non_existed_quiz(self):
         resp = self.client.get(reverse('quizzes-questions', args=(12311,)))
         self.assertEqual(resp.status_code, 404)
