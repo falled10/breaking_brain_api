@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.5.0 - UNRELEASED
+## v0.5.0 - 10.06.2021
 
 ### Features
 
