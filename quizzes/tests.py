@@ -87,3 +87,23 @@ class QuizTest(BaseAPITest):
         self.logout()
         resp = self.client.get(reverse('quizzes-questions', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 401)
+
+    def test_add_quiz_to_favorites(self):
+        self.assertEqual(self.user.favorites.count(), 0)
+        resp = self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(self.user.favorites.count(), 1)
+        self.assertTrue(self.user.favorites.filter(pk=self.quiz.id).exists())
+
+    def test_remove_quiz_from_favorites(self):
+        self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        resp = self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(self.user.favorites.count(), 0)
+
+    def test_get_list_of_favorites_quizzes(self):
+        self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        resp = self.client.get(reverse('quizzes-favorites'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data[0]['id'], self.quiz.id)
+        self.assertEqual(resp.data[0]['title'], self.quiz.title)

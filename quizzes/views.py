@@ -1,4 +1,5 @@
 from django.conf import settings
+from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
@@ -27,6 +28,16 @@ class QuizViewSet(ReadOnlyModelViewSet):
     Get list of questions for single quiz
 
     Get list of questions for single quiz
+
+    toggle_favorites:
+    Add/Remove quiz from favorites
+
+    Add or Remove quiz from favorites if it is already there
+
+    favorites:
+    List of all favorites quizzes
+
+    Get list of user's favorites quizzes
     """
 
     serializer_class = QuizSerializer
@@ -54,3 +65,18 @@ class QuizViewSet(ReadOnlyModelViewSet):
     def questions(self, request, pk=None, *args, **kwargs):
         quiz = get_object_or_404(Quiz, pk=pk)
         return Response(data=self.serializer_class(quiz.questions.all(), many=True).data)
+
+    @action(detail=True, methods=['POST'], url_name='toggle-favorites',
+            url_path='toggle-favorites', permission_classes=(IsAuthenticated,))
+    def toggle_favorites(self, request, pk=None, *args, **kwargs):
+        obj = get_object_or_404(Quiz, pk=pk)
+        if self.request.user.favorites.filter(pk=pk).exists():
+            self.request.user.favorites.remove(obj)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        self.request.user.favorites.add(obj)
+        return Response(data=self.get_serializer_class()(obj).data)
+
+    @action(detail=False, methods=['GET'], permission_classes=(IsAuthenticated,))
+    def favorites(self, request, *args, **kwargs):
+        return Response(data=self.get_serializer_class()(request.user.favorites.all(),
+                                                         many=True).data)

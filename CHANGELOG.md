@@ -5,6 +5,7 @@
 ### Features
 
 * Added user result functionality
+* Added possibility to add quiz to favorites
 
 ## v0.5.0 - 10.06.2021
 
