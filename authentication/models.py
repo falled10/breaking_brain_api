@@ -3,7 +3,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from quizzes.models import Tag
+from quizzes.models import Tag, Quiz
 
 
 class UserManager(BaseUserManager):
@@ -64,6 +64,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True)
 
     tags = models.ManyToManyField(Tag, related_name='users')
+
+    favorites = models.ManyToManyField(Quiz, related_name='users')
 
     date_joined = models.DateTimeField(auto_now_add=True, verbose_name=_('date joined'))
 
