@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.6.0 - UNRELEASED
+
+### Features
+
+* Added user result functionality
+
 ## v0.5.0 - 10.06.2021
 
 ### Features
