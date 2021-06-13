@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'quizzes',
     'users',
     'search',
+    'results',
 
     'rest_framework',
     'corsheaders',
