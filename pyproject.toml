@@ -25,6 +25,7 @@ argon2 = "^0.1.10"
 argon2-cffi = "^20.1.0"
 django-nested-inline = "^0.4.2"
 django-elasticsearch-dsl = "^7.2.0"
+stripe = "^2.58.0"
 
 [tool.poetry.dev-dependencies]
 

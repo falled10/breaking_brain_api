@@ -39,6 +39,7 @@ api_urlpatterns = [
     path('quizzes/', include('quizzes.urls')),
     path('users/', include('users.urls')),
     path('search/', include('search.urls')),
+    path('results/', include('results.urls')),
 ]
 
 urlpatterns = [

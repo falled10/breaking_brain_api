@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'quizzes',
     'users',
     'search',
+    'results',
 
     'rest_framework',
     'corsheaders',
@@ -300,6 +301,10 @@ PASSWORD_RESET_URL = env.str('PASSWORD_RESET_URL', 'http://localhost')
 MAILJET_PUBLIC_KEY = env.str('MAILJET_PUBLIC_KEY', '')
 MAILJET_SECRET_KEY = env.str('MAILJET_SECRET_KEY', '')
 MAILJET_USER = env.str('MAILJET_USER', '')
+
+
+STRIPE_PUBLIC_KEY = env.str('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = env.str('STRIPE_SECRET_KEY')
 
 
 PAGE_SIZE = 20

@@ -15,6 +15,8 @@ class Quiz(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     tags = models.ManyToManyField(Tag, related_name='quizzes')
+    is_free = models.BooleanField(default=False)
+    price = models.DecimalField(default=0, max_digits=5, decimal_places=2)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -31,3 +31,8 @@ class QuizSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField()
     description = serializers.CharField()
+
+
+class BuyQuizSerializer(serializers.Serializer):
+    confirmation = serializers.BooleanField()
+    payment_method_id = serializers.CharField()

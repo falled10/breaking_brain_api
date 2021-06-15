@@ -1,3 +1,5 @@
+from unittest.mock import patch, MagicMock
+
 from mixer.backend.django import mixer
 from django_elasticsearch_dsl.registries import registry
 from django.urls import reverse
@@ -9,7 +11,7 @@ from quizzes.models import Quiz, Question, Option, Lesson, Tag
 class QuizTest(BaseAPITest):
 
     def setUp(self):
-        self.quiz = mixer.blend(Quiz, title='something')
+        self.quiz = mixer.blend(Quiz, title='something', is_free=True)
         self.question = mixer.blend(Question, quiz=self.quiz)
         self.option = mixer.blend(Option, question=self.question)
         self.lesson = mixer.blend(Lesson, quiz=self.quiz)
@@ -87,3 +89,110 @@ class QuizTest(BaseAPITest):
         self.logout()
         resp = self.client.get(reverse('quizzes-questions', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 401)
+
+    def test_add_quiz_to_favorites(self):
+        self.assertEqual(self.user.favorites.count(), 0)
+        resp = self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(self.user.favorites.count(), 1)
+        self.assertTrue(self.user.favorites.filter(pk=self.quiz.id).exists())
+
+    def test_remove_quiz_from_favorites(self):
+        self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        resp = self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(self.user.favorites.count(), 0)
+
+    def test_get_list_of_favorites_quizzes(self):
+        self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        resp = self.client.get(reverse('quizzes-favorites'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data[0]['id'], self.quiz.id)
+        self.assertEqual(resp.data[0]['title'], self.quiz.title)
+
+    @patch('stripe.PaymentIntent.create')
+    def test_buy_quiz_without_confirmation(self, create):
+        self.quiz.is_free = False
+        self.quiz.save()
+        intent = MagicMock()
+        intent.status = 'succeeded'
+        create.return_value = intent
+        data = {
+            'confirmation': False,
+            'payment_method_id': 'something'
+        }
+        resp = self.client.post(reverse('quizzes-buy', args=(self.quiz.id,)), data=data)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data['id'], self.quiz.id)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.bought_quizzes.filter(pk=self.quiz.id).exists())
+
+    @patch('stripe.PaymentIntent.create')
+    def test_buy_quiz_should_be_confirmed(self, create):
+        self.quiz.is_free = False
+        self.quiz.save()
+        intent = MagicMock()
+        intent.status = 'requires_action'
+        intent.next_action.type = 'use_stripe_sdk'
+        create.return_value = intent
+        data = {
+            'confirmation': False,
+            'payment_method_id': 'something'
+        }
+        resp = self.client.post(reverse('quizzes-buy', args=(self.quiz.id,)), data=data)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.data['requires_action'])
+
+    @patch('stripe.PaymentIntent.confirm')
+    def test_buy_quiz_after_confirmation(self, confirm):
+        self.quiz.is_free = False
+        self.quiz.save()
+        intent = MagicMock()
+        intent.status = 'succeeded'
+        confirm.return_value = intent
+        data = {
+            'confirmation': True,
+            'payment_method_id': 'something'
+        }
+        resp = self.client.post(reverse('quizzes-buy', args=(self.quiz.id,)), data=data)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data['id'], self.quiz.id)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.bought_quizzes.filter(pk=self.quiz.id).exists())
+
+    def test_invalid_data_on_buy_quiz(self):
+        data = {
+            'confirmation': 'something',
+            'payment_method_id': None
+        }
+        resp = self.client.post(reverse('quizzes-buy', args=(self.quiz.id,)), data=data)
+        self.assertEqual(resp.status_code, 400)
+
+    def test_get_question_in_bought_quiz(self):
+        self.user.bought_quizzes.add(self.quiz)
+        self.quiz.is_free = False
+        self.quiz.save()
+        resp = self.client.get(reverse('quizzes-questions', args=(self.quiz.id,)))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data[0]['id'], self.question.id)
+
+    def test_get_questions_in_non_free_quiz(self):
+        self.quiz.is_free = False
+        self.quiz.save()
+        resp = self.client.get(reverse('quizzes-questions', args=(self.quiz.id,)))
+        self.assertEqual(resp.status_code, 403)
+
+    def test_add_bought_quiz_to_favorites(self):
+        self.user.bought_quizzes.add(self.quiz)
+        self.quiz.is_free = False
+        self.quiz.save()
+        self.assertEqual(self.user.favorites.count(), 0)
+        resp = self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        self.assertEqual(resp.status_code, 200)
+
+    def test_add_non_free_quiz_to_favorites(self):
+        self.quiz.is_free = False
+        self.quiz.save()
+        self.assertEqual(self.user.favorites.count(), 0)
+        resp = self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        self.assertEqual(resp.status_code, 403)
