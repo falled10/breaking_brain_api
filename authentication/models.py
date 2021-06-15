@@ -66,6 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     tags = models.ManyToManyField(Tag, related_name='users')
 
     favorites = models.ManyToManyField(Quiz, related_name='users')
+    bought_quizzes = models.ManyToManyField(Quiz, related_name='buyers')
 
     date_joined = models.DateTimeField(auto_now_add=True, verbose_name=_('date joined'))
 

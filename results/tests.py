@@ -10,7 +10,7 @@ class TestQuizResult(BaseAPITest):
 
     def setUp(self):
         self.user = self.create_and_login()
-        self.quiz = mixer.blend(Quiz)
+        self.quiz = mixer.blend(Quiz, is_free=True)
         self.quiz_result = mixer.blend(QuizResult, quiz=self.quiz, user=self.user)
         self.question = mixer.blend(Question, quiz=self.quiz)
         self.right_option = mixer.blend(Option, question=self.question, is_right=True)
@@ -138,3 +138,22 @@ class TestQuizResult(BaseAPITest):
         resp = self.client.get(reverse('quizzes-result-last-question', args=(self.quiz_result.id,)))
         self.assertEqual(resp.status_code, 200)
         self.assertIsNone(resp.data['last_question_id'])
+
+    def test_create_user_bought_quiz_result(self):
+        self.user.bought_quizzes.add(self.quiz)
+        self.quiz.is_free = False
+        self.quiz.save()
+        data = {
+            'quiz': self.quiz.id
+        }
+        resp = self.client.post(reverse('quizzes-result-list'), data=data)
+        self.assertEqual(resp.status_code, 201)
+
+    def test_create_user_non_free_quiz_result(self):
+        self.quiz.is_free = False
+        self.quiz.save()
+        data = {
+            'quiz': self.quiz.id
+        }
+        resp = self.client.post(reverse('quizzes-result-list'), data=data)
+        self.assertEqual(resp.status_code, 400)

@@ -688,6 +688,17 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "stripe"
+version = "2.58.0"
+description = "Python bindings for the Stripe API"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[package.dependencies]
+requests = {version = ">=2.20", markers = "python_version >= \"3.0\""}
+
+[[package]]
 name = "text-unidecode"
 version = "1.3"
 description = "The most basic Text::Unidecode port"
@@ -735,7 +746,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "948ea16ad0cf6d1d874a02b38b75ccf9b98ded92d46b43256868ff13b4d35d3b"
+content-hash = "52f560e32f6fd028d0adfa51a10bc03513073e61132018d7d2a65d08981549ec"
 
 [metadata.files]
 amqp = [
@@ -1122,6 +1133,10 @@ six = [
 sqlparse = [
     {file = "sqlparse-0.4.1-py3-none-any.whl", hash = "sha256:017cde379adbd6a1f15a61873f43e8274179378e95ef3fede90b5aa64d304ed0"},
     {file = "sqlparse-0.4.1.tar.gz", hash = "sha256:0f91fd2e829c44362cbcfab3e9ae12e22badaa8a29ad5ff599f9ec109f0454e8"},
+]
+stripe = [
+    {file = "stripe-2.58.0-py2.py3-none-any.whl", hash = "sha256:15a2068dce84e9cc68a41b006286dc58ebe55a7999cdbd8bb1b1e5d2c4594c7f"},
+    {file = "stripe-2.58.0.tar.gz", hash = "sha256:34829b528e652ffc919d40eff2ba78021149818bab76e33c07801382921cf6d5"},
 ]
 text-unidecode = [
     {file = "text-unidecode-1.3.tar.gz", hash = "sha256:bad6603bb14d279193107714b288be206cac565dfa49aa5b105294dd5c4aab93"},

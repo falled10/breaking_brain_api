@@ -1,11 +1,12 @@
 # CHANGELOG
 
-## v0.6.0 - UNRELEASED
+## v0.6.0 - 15.06.2021
 
 ### Features
 
 * Added user result functionality
 * Added possibility to add quiz to favorites
+* Added possibility to buy not free quizzes
 
 ## v0.5.0 - 10.06.2021
 

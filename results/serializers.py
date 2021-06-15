@@ -1,6 +1,7 @@
 from django.db.models import Count, Q
 from rest_framework import serializers
 
+from quizzes.utils import has_bought_quiz
 from results.models import QuizResult, QuestionResult, OptionResult
 
 
@@ -34,6 +35,11 @@ class QuizResultSerializer(serializers.ModelSerializer):
         model = QuizResult
         fields = ('id', 'quiz', 'result', 'is_finished', 'created_at')
         read_only_fields = ('id', 'result', 'created_at')
+
+    def validate_quiz(self, value):
+        if not has_bought_quiz(value, self.context['request'].user):
+            raise serializers.ValidationError("You should buy this quiz first")
+        return value
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
