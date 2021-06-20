@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'search',
     'results',
 
+    'oauth2_provider',
     'rest_framework',
     'corsheaders',
     'drf_yasg',
@@ -217,7 +218,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ),
 
     'DEFAULT_RENDERER_CLASSES': (
