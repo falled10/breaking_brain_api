@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 from django.utils import timezone
+from mixer.backend.django import mixer
 from rest_framework.test import APITestCase
-from rest_framework_simplejwt.settings import api_settings
-from rest_framework_simplejwt.tokens import AccessToken
+from oauthlib.common import generate_token
+from oauth2_provider.models import AccessToken
 
 from authentication.models import User
 
@@ -22,9 +25,10 @@ class BaseAPITest(APITestCase):
         return user
 
     def authorize(self, user, **additional_headers):
-        token = AccessToken.for_user(user)
+        tok = generate_token()
+        token = mixer.blend(AccessToken, user=user, expires=timezone.now() + timedelta(hours=1), token=tok)
         self.client.credentials(
-            HTTP_AUTHORIZATION=f"{api_settings.AUTH_HEADER_TYPES[0]} {token}",
+            HTTP_AUTHORIZATION=f"Bearer {token}",
             **additional_headers
         )
 

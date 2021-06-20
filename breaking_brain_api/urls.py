@@ -40,12 +40,14 @@ api_urlpatterns = [
     path('users/', include('users.urls')),
     path('search/', include('search.urls')),
     path('results/', include('results.urls')),
+    path('recommend-quizzes/', include('results.urls')),
 ]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='docs-schema-ui'),
-    path('api/', include(api_urlpatterns)),
+    path('v1/', include((api_urlpatterns, 'v1'))),
+    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 ]
 
 if settings.DEBUG:

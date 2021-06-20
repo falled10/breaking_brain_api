@@ -1,3 +1,4 @@
+from unittest.mock import patch
 from mixer.backend.django import mixer
 from django.urls import reverse
 
@@ -20,7 +21,7 @@ class TestQuizResult(BaseAPITest):
         data = {
             'quiz': self.quiz.id
         }
-        resp = self.client.post(reverse('quizzes-result-list'), data=data)
+        resp = self.client.post(reverse('v1:quizzes-result-list'), data=data)
         self.assertEqual(resp.status_code, 201)
         self.assertTrue(QuizResult.objects.filter(quiz=self.quiz, is_finished=False).exists())
 
@@ -29,7 +30,7 @@ class TestQuizResult(BaseAPITest):
         data = {
             'quiz': self.quiz.id
         }
-        resp = self.client.post(reverse('quizzes-result-list'), data=data)
+        resp = self.client.post(reverse('v1:quizzes-result-list'), data=data)
         self.assertEqual(resp.status_code, 401)
 
     def test_create_question_result(self):
@@ -45,7 +46,7 @@ class TestQuizResult(BaseAPITest):
                 }
             ]
         }
-        resp = self.client.post(reverse('create-question-result'), data=data)
+        resp = self.client.post(reverse('v1:create-question-result'), data=data)
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(QuestionResult.objects.count(), 1)
         self.assertEqual(OptionResult.objects.count(), 2)
@@ -64,11 +65,11 @@ class TestQuizResult(BaseAPITest):
                 }
             ]
         }
-        resp = self.client.post(reverse('create-question-result'), data=data)
+        resp = self.client.post(reverse('v1:create-question-result'), data=data)
         self.assertEqual(resp.status_code, 400)
 
     def test_get_list_of_results(self):
-        resp = self.client.get(reverse('quizzes-result-list'))
+        resp = self.client.get(reverse('v1:quizzes-result-list'))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['results'][0]['id'], self.quiz_result.id)
         self.assertEqual(resp.data['results'][0]['result'], self.quiz_result.result)
@@ -76,16 +77,17 @@ class TestQuizResult(BaseAPITest):
     def test_get_list_of_results_when_logged_out(self):
         self.logout()
         mixer.blend(QuizResult, user=self.user)
-        resp = self.client.get(reverse('quizzes-result-list'))
+        resp = self.client.get(reverse('v1:quizzes-result-list'))
         self.assertEqual(resp.status_code, 401)
 
     def test_get_single_result(self):
         quiz_result = mixer.blend(QuizResult, user=self.user)
-        resp = self.client.get(reverse('quizzes-result-detail', args=(quiz_result.id,)))
+        resp = self.client.get(reverse('v1:quizzes-result-detail', args=(quiz_result.id,)))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['id'], quiz_result.id)
 
-    def test_finish_quiz_after_there_are_questions(self):
+    @patch('recommendation_system.utils.create_relation')
+    def test_finish_quiz_after_there_are_questions(self, create_relation):
         data = {
             'question': self.question.id,
             'quiz': self.quiz_result.id,
@@ -98,8 +100,8 @@ class TestQuizResult(BaseAPITest):
                 }
             ]
         }
-        self.client.post(reverse('create-question-result'), data=data)
-        self.client.patch(reverse('quizzes-result-detail', args=(self.quiz_result.id,)),
+        self.client.post(reverse('v1:create-question-result'), data=data)
+        self.client.patch(reverse('v1:quizzes-result-detail', args=(self.quiz_result.id,)),
                           data={
                               'is_finished': True
                           })
@@ -107,8 +109,9 @@ class TestQuizResult(BaseAPITest):
         self.assertEqual(self.quiz_result.result, 1)
         self.assertTrue(self.quiz_result.is_finished)
 
-    def test_finish_quiz_without_questions(self):
-        self.client.patch(reverse('quizzes-result-detail', args=(self.quiz_result.id,)),
+    @patch('recommendation_system.utils.create_relation')
+    def test_finish_quiz_without_questions(self, create_relation):
+        self.client.patch(reverse('v1:quizzes-result-detail', args=(self.quiz_result.id,)),
                           data={
                               'is_finished': True
                           })
@@ -129,13 +132,13 @@ class TestQuizResult(BaseAPITest):
                 }
             ]
         }
-        self.client.post(reverse('create-question-result'), data=data)
-        resp = self.client.get(reverse('quizzes-result-last-question', args=(self.quiz_result.id,)))
+        self.client.post(reverse('v1:create-question-result'), data=data)
+        resp = self.client.get(reverse('v1:quizzes-result-last-question', args=(self.quiz_result.id,)))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['last_question_id'], self.question.id)
 
     def test_get_last_question_without_questions(self):
-        resp = self.client.get(reverse('quizzes-result-last-question', args=(self.quiz_result.id,)))
+        resp = self.client.get(reverse('v1:quizzes-result-last-question', args=(self.quiz_result.id,)))
         self.assertEqual(resp.status_code, 200)
         self.assertIsNone(resp.data['last_question_id'])
 
@@ -146,7 +149,7 @@ class TestQuizResult(BaseAPITest):
         data = {
             'quiz': self.quiz.id
         }
-        resp = self.client.post(reverse('quizzes-result-list'), data=data)
+        resp = self.client.post(reverse('v1:quizzes-result-list'), data=data)
         self.assertEqual(resp.status_code, 201)
 
     def test_create_user_non_free_quiz_result(self):
@@ -155,5 +158,5 @@ class TestQuizResult(BaseAPITest):
         data = {
             'quiz': self.quiz.id
         }
-        resp = self.client.post(reverse('quizzes-result-list'), data=data)
+        resp = self.client.post(reverse('v1:quizzes-result-list'), data=data)
         self.assertEqual(resp.status_code, 400)

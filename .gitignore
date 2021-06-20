@@ -3,6 +3,9 @@
 .data
 media
 .vscode
+data
+import
+plugins
 
 static_tmp/
 node_modules

@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v0.7.0 - 20.06.2021
+
+### Features
+
+* Added recommendation system
+
+### Improvements
+
+* Added versioning for API
+* Changed default auth system to oauth2
+
 ## v0.6.0 - 15.06.2021
 
 ### Features

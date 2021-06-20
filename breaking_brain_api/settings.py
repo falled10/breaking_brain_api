@@ -15,13 +15,12 @@ import os
 from pathlib import Path
 
 from environs import Env
-
+from py2neo import Graph
 
 env = Env()
 env.read_env('.env/vars')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -48,7 +47,9 @@ INSTALLED_APPS = [
     'users',
     'search',
     'results',
+    'recommendation_system',
 
+    'oauth2_provider',
     'rest_framework',
     'corsheaders',
     'drf_yasg',
@@ -94,7 +95,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'breaking_brain_api.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -108,7 +108,6 @@ DATABASES = {
         'PORT': env.str('DB_PORT', ''),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -127,7 +126,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -217,7 +215,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ),
 
     'DEFAULT_RENDERER_CLASSES': (
@@ -284,7 +282,6 @@ SWAGGER_SETTINGS = {
     }
 }
 
-
 CORS_ORIGIN_ALLOW_ALL = env.bool('CORS_ALLOW_ALL', False)
 
 CORS_ORIGIN_WHITELIST = env.list('CORS_ORIGINS', '')
@@ -302,9 +299,18 @@ MAILJET_PUBLIC_KEY = env.str('MAILJET_PUBLIC_KEY', '')
 MAILJET_SECRET_KEY = env.str('MAILJET_SECRET_KEY', '')
 MAILJET_USER = env.str('MAILJET_USER', '')
 
-
 STRIPE_PUBLIC_KEY = env.str('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = env.str('STRIPE_SECRET_KEY')
 
-
 PAGE_SIZE = 20
+
+# Neo4j
+
+NEO_HOST = env.str('NEO_HOST', 'localhost')
+NEO_PORT = env.int('NEO_PORT', 7687)
+NEO4J_AUTH = env.str('NEO4J_AUTH')
+
+NEO_SETTINGS = dict(user_agent="bolt+s",
+                    auth=tuple(NEO4J_AUTH.split('/')), host=NEO_HOST, port=NEO_PORT)
+
+GRAPH = Graph(**NEO_SETTINGS)
