@@ -18,7 +18,7 @@ class QuizTest(BaseAPITest):
         self.user = self.create_and_login()
 
     def test_get_list_of_quizes(self):
-        resp = self.client.get(reverse('quizzes-list'))
+        resp = self.client.get(reverse('v1:quizzes-list'))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['count'], 1)
         self.assertEqual(resp.data['results'][0]['id'], self.quiz.id)
@@ -28,14 +28,14 @@ class QuizTest(BaseAPITest):
 
     def test_get_list_of_quizes_when_logged_out(self):
         self.logout()
-        resp = self.client.get(reverse('quizzes-list'))
+        resp = self.client.get(reverse('v1:quizzes-list'))
         self.assertEqual(resp.status_code, 200)
 
     def test_search_quiz_by_its_title(self):
         registry.update(self.quiz)
         registry.update_related(self.quiz)
-        url = f"{reverse('quizzes-search')}?q=something"
-        url2 = f"{reverse('quizzes-search')}?q=else"
+        url = f"{reverse('v1:quizzes-search')}?q=something"
+        url2 = f"{reverse('v1:quizzes-search')}?q=else"
         resp = self.client.get(url)
         resp2 = self.client.get(url2)
         self.assertEqual(resp.status_code, 200)
@@ -49,7 +49,7 @@ class QuizTest(BaseAPITest):
         self.quiz.tags.add(mixer.blend(Tag, label='tag-label'))
         registry.update(self.quiz)
         registry.update_related(self.quiz)
-        url = f"{reverse('quizzes-search')}?q=tag-label"
+        url = f"{reverse('v1:quizzes-search')}?q=tag-label"
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data[0]['title'], self.quiz.title)
@@ -58,7 +58,7 @@ class QuizTest(BaseAPITest):
         registry.delete_related(self.quiz)
 
     def test_get_single_quiz(self):
-        resp = self.client.get(reverse('quizzes-detail', args=(self.quiz.id,)))
+        resp = self.client.get(reverse('v1:quizzes-detail', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['id'], self.quiz.id)
         self.assertEqual(resp.data['title'], self.quiz.title)
@@ -67,45 +67,45 @@ class QuizTest(BaseAPITest):
 
     def test_get_single_quiz_when_logout(self):
         self.logout()
-        resp = self.client.get(reverse('quizzes-detail', args=(self.quiz.id,)))
+        resp = self.client.get(reverse('v1:quizzes-detail', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 200)
 
     def test_get_non_existed_quiz(self):
-        resp = self.client.get(reverse('quizzes-detail', args=(123123,)))
+        resp = self.client.get(reverse('v1:quizzes-detail', args=(123123,)))
         self.assertEqual(resp.status_code, 404)
 
     def test_get_questions_from_quiz(self):
-        resp = self.client.get(reverse('quizzes-questions', args=(self.quiz.id,)))
+        resp = self.client.get(reverse('v1:quizzes-questions', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data[0]['id'], self.question.id)
         self.assertEqual(resp.data[0]['options'][0]['id'], self.option.id)
         self.assertEqual(len(resp.data), 1)
 
     def test_get_quesionts_from_non_existed_quiz(self):
-        resp = self.client.get(reverse('quizzes-questions', args=(12311,)))
+        resp = self.client.get(reverse('v1:quizzes-questions', args=(12311,)))
         self.assertEqual(resp.status_code, 404)
 
     def test_get_questions_from_quiz_when_logout(self):
         self.logout()
-        resp = self.client.get(reverse('quizzes-questions', args=(self.quiz.id,)))
+        resp = self.client.get(reverse('v1:quizzes-questions', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 401)
 
     def test_add_quiz_to_favorites(self):
         self.assertEqual(self.user.favorites.count(), 0)
-        resp = self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        resp = self.client.post(reverse('v1:quizzes-toggle-favorites', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(self.user.favorites.count(), 1)
         self.assertTrue(self.user.favorites.filter(pk=self.quiz.id).exists())
 
     def test_remove_quiz_from_favorites(self):
-        self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
-        resp = self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        self.client.post(reverse('v1:quizzes-toggle-favorites', args=(self.quiz.id,)))
+        resp = self.client.post(reverse('v1:quizzes-toggle-favorites', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 204)
         self.assertEqual(self.user.favorites.count(), 0)
 
     def test_get_list_of_favorites_quizzes(self):
-        self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
-        resp = self.client.get(reverse('quizzes-favorites'))
+        self.client.post(reverse('v1:quizzes-toggle-favorites', args=(self.quiz.id,)))
+        resp = self.client.get(reverse('v1:quizzes-favorites'))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data[0]['id'], self.quiz.id)
         self.assertEqual(resp.data[0]['title'], self.quiz.title)
@@ -121,7 +121,7 @@ class QuizTest(BaseAPITest):
             'confirmation': False,
             'payment_method_id': 'something'
         }
-        resp = self.client.post(reverse('quizzes-buy', args=(self.quiz.id,)), data=data)
+        resp = self.client.post(reverse('v1:quizzes-buy', args=(self.quiz.id,)), data=data)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['id'], self.quiz.id)
         self.user.refresh_from_db()
@@ -139,7 +139,7 @@ class QuizTest(BaseAPITest):
             'confirmation': False,
             'payment_method_id': 'something'
         }
-        resp = self.client.post(reverse('quizzes-buy', args=(self.quiz.id,)), data=data)
+        resp = self.client.post(reverse('v1:quizzes-buy', args=(self.quiz.id,)), data=data)
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(resp.data['requires_action'])
 
@@ -154,7 +154,7 @@ class QuizTest(BaseAPITest):
             'confirmation': True,
             'payment_method_id': 'something'
         }
-        resp = self.client.post(reverse('quizzes-buy', args=(self.quiz.id,)), data=data)
+        resp = self.client.post(reverse('v1:quizzes-buy', args=(self.quiz.id,)), data=data)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['id'], self.quiz.id)
         self.user.refresh_from_db()
@@ -165,21 +165,21 @@ class QuizTest(BaseAPITest):
             'confirmation': 'something',
             'payment_method_id': None
         }
-        resp = self.client.post(reverse('quizzes-buy', args=(self.quiz.id,)), data=data)
+        resp = self.client.post(reverse('v1:quizzes-buy', args=(self.quiz.id,)), data=data)
         self.assertEqual(resp.status_code, 400)
 
     def test_get_question_in_bought_quiz(self):
         self.user.bought_quizzes.add(self.quiz)
         self.quiz.is_free = False
         self.quiz.save()
-        resp = self.client.get(reverse('quizzes-questions', args=(self.quiz.id,)))
+        resp = self.client.get(reverse('v1:quizzes-questions', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data[0]['id'], self.question.id)
 
     def test_get_questions_in_non_free_quiz(self):
         self.quiz.is_free = False
         self.quiz.save()
-        resp = self.client.get(reverse('quizzes-questions', args=(self.quiz.id,)))
+        resp = self.client.get(reverse('v1:quizzes-questions', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 403)
 
     def test_add_bought_quiz_to_favorites(self):
@@ -187,12 +187,12 @@ class QuizTest(BaseAPITest):
         self.quiz.is_free = False
         self.quiz.save()
         self.assertEqual(self.user.favorites.count(), 0)
-        resp = self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        resp = self.client.post(reverse('v1:quizzes-toggle-favorites', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 200)
 
     def test_add_non_free_quiz_to_favorites(self):
         self.quiz.is_free = False
         self.quiz.save()
         self.assertEqual(self.user.favorites.count(), 0)
-        resp = self.client.post(reverse('quizzes-toggle-favorites', args=(self.quiz.id,)))
+        resp = self.client.post(reverse('v1:quizzes-toggle-favorites', args=(self.quiz.id,)))
         self.assertEqual(resp.status_code, 403)

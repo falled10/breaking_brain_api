@@ -19,18 +19,18 @@ class TestUserProfile(BaseAPITest):
         }
 
     def test_get_user_profile(self):
-        resp = self.client.get(reverse('users:profile'))
+        resp = self.client.get(reverse('v1:users:profile'))
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['id'], self.user.id)
         self.assertEqual(resp.data['username'], self.user.username)
 
     def test_get_user_profile_logout_user(self):
         self.logout()
-        resp = self.client.get(reverse('users:profile'))
+        resp = self.client.get(reverse('v1:users:profile'))
         self.assertEqual(resp.status_code, 401)
 
     def test_update_user_profile(self):
-        resp = self.client.put(reverse('users:profile'), data=self.data)
+        resp = self.client.put(reverse('v1:users:profile'), data=self.data)
         self.user.refresh_from_db()
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(self.user.username, self.data['username'])
@@ -41,16 +41,16 @@ class TestUserProfile(BaseAPITest):
             'username': '',
             'email': 'asdfadf'
         }
-        resp = self.client.put(reverse('users:profile'), data=data)
+        resp = self.client.put(reverse('v1:users:profile'), data=data)
         self.assertEqual(resp.status_code, 400)
 
     def test_update_user_profile_when_logout(self):
         self.logout()
-        resp = self.client.put(reverse('users:profile'), data=self.data)
+        resp = self.client.put(reverse('v1:users:profile'), data=self.data)
         self.assertEqual(resp.status_code, 401)
 
     def test_update_partial_user_profile(self):
-        resp = self.client.patch(reverse('users:profile'), data={'username': self.data['username']})
+        resp = self.client.patch(reverse('v1:users:profile'), data={'username': self.data['username']})
         self.user.refresh_from_db()
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(self.user.username, self.data['username'])
@@ -62,13 +62,13 @@ class ForgetPasswordViewTest(BaseAPITest):
     @patch('breaking_brain_api.tasks.send_email.delay')
     def test_send_password_forget_email(self, send):
         user = self.create()
-        resp = self.client.post(reverse('users:password-forget'), data={"email": user.email})
+        resp = self.client.post(reverse('v1:users:password-forget'), data={"email": user.email})
         self.assertEqual(resp.status_code, 204)
         send.assert_called_once()
 
     @patch('breaking_brain_api.tasks.send_email.delay')
     def test_send_password_forget_email_with_invalid_email(self, send):
-        resp = self.client.post(reverse('users:password-forget'), data={"email": "some_user@mail.com"})
+        resp = self.client.post(reverse('v1:users:password-forget'), data={"email": "some_user@mail.com"})
         self.assertEqual(resp.status_code, 400)
         send.assert_not_called()
 
@@ -84,7 +84,7 @@ class PasswordResetViewTest(BaseAPITest):
         }
 
     def test_reset_password(self):
-        resp = self.client.post(reverse('users:password-reset'), data=self.data)
+        resp = self.client.post(reverse('v1:users:password-reset'), data=self.data)
         self.assertEqual(resp.status_code, 204)
         user = User.objects.get(id=self.user.id)
         self.assertTrue(user.check_password(self.data['new_password']))
@@ -92,20 +92,20 @@ class PasswordResetViewTest(BaseAPITest):
     def test_reset_password_invalid_token(self):
         data_copy = self.data.copy()
         data_copy['token'] += 'something'
-        resp = self.client.post(reverse('users:password-reset'), data=data_copy)
+        resp = self.client.post(reverse('v1:users:password-reset'), data=data_copy)
         self.assertEqual(resp.status_code, 400)
 
     def test_reset_password_password_are_not_equal(self):
         data_copy = self.data.copy()
         data_copy['new_password'] += 'something'
-        resp = self.client.post(reverse('users:password-reset'), data=data_copy)
+        resp = self.client.post(reverse('v1:users:password-reset'), data=data_copy)
         self.assertEqual(resp.status_code, 400)
 
     def test_reset_password_invalid_email_in_token(self):
         data_copy = self.data.copy()
         data_copy['token'] = f"{urlsafe_base64_encode(force_bytes('123@mail.com'))}." \
                              f"{TokenGenerator.make_token(self.user)}"
-        resp = self.client.post(reverse('users:password-reset'), data=data_copy)
+        resp = self.client.post(reverse('v1:users:password-reset'), data=data_copy)
         self.assertEqual(resp.status_code, 400)
 
 
@@ -119,7 +119,7 @@ class ChangePasswordView(BaseAPITest):
         }
 
     def test_change_user_password(self):
-        resp = self.client.post(reverse('users:password-update'), data=self.data)
+        resp = self.client.post(reverse('v1:users:password-update'), data=self.data)
         user = User.objects.get(pk=self.user.id)
         self.assertEqual(resp.status_code, 204)
         self.assertTrue(user.check_password(self.data['newPassword']))
@@ -127,10 +127,10 @@ class ChangePasswordView(BaseAPITest):
     def test_change_user_password_passwords_are_not_enqual(self):
         data_copy = self.data.copy()
         data_copy['confirmedPassword'] += 'something'
-        resp = self.client.post(reverse('users:password-update'), data=data_copy)
+        resp = self.client.post(reverse('v1:users:password-update'), data=data_copy)
         self.assertEqual(resp.status_code, 400)
 
     def test_change_user_password_when_logout(self):
         self.logout()
-        resp = self.client.post(reverse('users:password-update'), data=self.data)
+        resp = self.client.post(reverse('v1:users:password-update'), data=self.data)
         self.assertEqual(resp.status_code, 401)

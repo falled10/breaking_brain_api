@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.7.0 - UNRELEASED
+
+### Improvements
+
+* Added versioning for API
+
 ## v0.6.0 - 15.06.2021
 
 ### Features
