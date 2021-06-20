@@ -27,3 +27,14 @@ services:
       - 9300:9300
     volumes:
       - ./.data/elasticsearch:/usr/share/elasticsearch/data
+  neo4j:
+    container_name: neo4j
+    image: neo4j:latest
+    env_file: .env/vars
+    volumes:
+      - ./plugins:/plugins
+      - ./data/neo4j:/data
+      - ./import:/import
+    ports:
+      - 7474:7474
+      - 7687:7687

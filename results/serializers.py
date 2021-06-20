@@ -2,6 +2,8 @@ from django.db.models import Count, Q
 from rest_framework import serializers
 
 from quizzes.utils import has_bought_quiz
+from recommendation_system.schemas import QuizSchema
+from recommendation_system.utils import create_relation
 from results.models import QuizResult, QuestionResult, OptionResult
 
 
@@ -56,4 +58,6 @@ class QuizResultSerializer(serializers.ModelSerializer):
                     right_count=Count('id', filter=Q(option__is_right=True)))['right_count'] or 0
             obj.result = result
             obj.save(update_fields=('result',))
+            create_relation(QuizSchema.from_orm(obj.quiz).dict(),
+                            {'user_id': obj.user.id})
         return obj

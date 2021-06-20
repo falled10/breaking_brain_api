@@ -1,6 +1,10 @@
 # CHANGELOG
 
-## v0.7.0 - UNRELEASED
+## v0.7.0 - 20.06.2021
+
+### Features
+
+* Added recommendation system
 
 ### Improvements
 

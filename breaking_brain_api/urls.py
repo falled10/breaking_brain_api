@@ -40,6 +40,7 @@ api_urlpatterns = [
     path('users/', include('users.urls')),
     path('search/', include('search.urls')),
     path('results/', include('results.urls')),
+    path('recommend-quizzes/', include('results.urls')),
 ]
 
 urlpatterns = [
