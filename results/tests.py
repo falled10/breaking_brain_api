@@ -1,3 +1,4 @@
+from unittest.mock import patch
 from mixer.backend.django import mixer
 from django.urls import reverse
 
@@ -85,7 +86,8 @@ class TestQuizResult(BaseAPITest):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['id'], quiz_result.id)
 
-    def test_finish_quiz_after_there_are_questions(self):
+    @patch('recommendation_system.utils.create_relation')
+    def test_finish_quiz_after_there_are_questions(self, create_relation):
         data = {
             'question': self.question.id,
             'quiz': self.quiz_result.id,
@@ -107,7 +109,8 @@ class TestQuizResult(BaseAPITest):
         self.assertEqual(self.quiz_result.result, 1)
         self.assertTrue(self.quiz_result.is_finished)
 
-    def test_finish_quiz_without_questions(self):
+    @patch('recommendation_system.utils.create_relation')
+    def test_finish_quiz_without_questions(self, create_relation):
         self.client.patch(reverse('v1:quizzes-result-detail', args=(self.quiz_result.id,)),
                           data={
                               'is_finished': True

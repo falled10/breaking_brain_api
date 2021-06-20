@@ -12,6 +12,7 @@ services:
       - postgres
       - redis
       - elasticsearch
+      - neo4j
   celery:
     build: .
     command: celery -A breaking_brain_api worker -l info
@@ -68,3 +69,14 @@ services:
       - ./media:/app/media
     depends_on:
       - api
+  neo4j:
+    container_name: neo4j
+    image: neo4j:latest
+    env_file: .env/vars
+    volumes:
+      - ./plugins:/plugins
+      - ./data/neo4j:/data
+      - ./import:/import
+    ports:
+      - 7474:7474
+      - 7687:7687
