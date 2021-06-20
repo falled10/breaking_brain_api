@@ -22,7 +22,7 @@ class TestSearch(BaseAPITest):
         registry.delete_related(self.lesson)
 
     def test_search_by_all_indexes(self):
-        url = f"{reverse('search')}?q=something"
+        url = f"{reverse('v1:search')}?q=something"
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.data['lessons'][0]['id'], self.lesson.id)
@@ -30,7 +30,7 @@ class TestSearch(BaseAPITest):
         self.assertEqual(resp.data['quizzes'][1]['title'], self.quiz.title)
 
     def test_search_by_all_indexes_when_query_is_wrong(self):
-        url = f"{reverse('search')}?q=else"
+        url = f"{reverse('v1:search')}?q=else"
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(len(resp.data['quizzes']), 0)

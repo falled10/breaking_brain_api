@@ -18,13 +18,15 @@ class APITestObtainJSONWebToken(BaseAPITest):
         self.user = self.create(email=self.email, password=self.password)
 
     def test_get_token_pair(self):
-        resp = self.client.post(reverse('authentication:auth'), data={'email': self.email, 'password': self.password})
+        resp = self.client.post(reverse('v1:authentication:auth'),
+                                data={'email': self.email, 'password': self.password})
         self.assertEqual(resp.status_code, 200)
         self.assertIn('refresh', resp.data)
         self.assertIn('access', resp.data)
 
     def test_get_token_authentication_error(self):
-        resp = self.client.post(reverse('authentication:auth'), data={'email': 'fake_data', 'password': 'fake_data'})
+        resp = self.client.post(reverse('v1:authentication:auth'),
+                                data={'email': 'fake_data', 'password': 'fake_data'})
         self.assertEqual(resp.status_code, 401)
 
 
@@ -37,11 +39,11 @@ class APITestVerifyJSONWebToken(BaseAPITest):
         self.access_token = str(AccessToken.for_user(self.user))
 
     def test_token_is_valid(self):
-        resp = self.client.post(reverse('authentication:auth-verify'), data={'token': self.access_token})
+        resp = self.client.post(reverse('v1:authentication:auth-verify'), data={'token': self.access_token})
         self.assertEqual(resp.status_code, 200)
 
     def test_get_token_validation_error(self):
-        resp = self.client.post(reverse('authentication:auth-verify'), data={'token': 'fake_data'})
+        resp = self.client.post(reverse('v1:authentication:auth-verify'), data={'token': 'fake_data'})
         self.assertEqual(resp.status_code, 401)
 
 
@@ -54,11 +56,11 @@ class APITestRefreshJSONWebToken(BaseAPITest):
         self.refresh_token = str(RefreshToken.for_user(self.user))
 
     def test_get_access_token(self):
-        resp = self.client.post(reverse('authentication:auth-refresh'), data={'refresh': self.refresh_token})
+        resp = self.client.post(reverse('v1:authentication:auth-refresh'), data={'refresh': self.refresh_token})
         self.assertIn('access', resp.data)
 
     def test_get_token_refresh_error(self):
-        resp = self.client.post(reverse('authentication:auth-refresh'), data={'refresh': 'fake_data'})
+        resp = self.client.post(reverse('v1:authentication:auth-refresh'), data={'refresh': 'fake_data'})
         self.assertEqual(resp.status_code, 401)
 
 
@@ -71,7 +73,7 @@ class TestSignUpView(BaseAPITest):
             'username': 'testuser',
             'password': 'testpass123'
         }
-        resp = self.client.post(reverse('authentication:auth-register'), data=data)
+        resp = self.client.post(reverse('v1:authentication:auth-register'), data=data)
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(User.objects.count(), 1)
         send.assert_called_once()
@@ -83,7 +85,7 @@ class TestSignUpView(BaseAPITest):
             'username': '',
             'password': 'testpass123'
         }
-        resp = self.client.post(reverse('authentication:auth-register'), data=data)
+        resp = self.client.post(reverse('v1:authentication:auth-register'), data=data)
         self.assertEqual(resp.status_code, 400)
         send.assert_not_called()
 
@@ -95,7 +97,7 @@ class TestSignUpView(BaseAPITest):
             'username': 'testuser',
             'password': 'testpass123'
         }
-        resp = self.client.post(reverse('authentication:auth-register'), data=data)
+        resp = self.client.post(reverse('v1:authentication:auth-register'), data=data)
         self.assertEqual(resp.status_code, 400)
         send.assert_not_called()
 
@@ -108,24 +110,24 @@ class TestUserActivation(BaseAPITest):
 
     def test_user_activation(self):
         token = f"{urlsafe_base64_encode(force_bytes(self.user.email))}.{TokenGenerator.make_token(self.user)}"
-        resp = self.client.post(reverse('authentication:auth-activate'), data={'token': token})
+        resp = self.client.post(reverse('v1:authentication:auth-activate'), data={'token': token})
         self.user.refresh_from_db()
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(self.user.is_active)
 
     def test_user_activation_returns_access_token(self):
         token = f"{urlsafe_base64_encode(force_bytes(self.user.email))}.{TokenGenerator.make_token(self.user)}"
-        resp = self.client.post(reverse('authentication:auth-activate'), data={'token': token})
+        resp = self.client.post(reverse('v1:authentication:auth-activate'), data={'token': token})
         self.assertEqual(resp.status_code, 200)
         self.assertTrue('access_token' in resp.data.keys())
         self.assertTrue('refresh_token' in resp.data.keys())
 
     def test_user_activation_wrong_uid(self):
         token = f"something.{TokenGenerator.make_token(self.user)}"
-        resp = self.client.post(reverse('authentication:auth-activate'), data={'token': token})
+        resp = self.client.post(reverse('v1:authentication:auth-activate'), data={'token': token})
         self.assertEqual(resp.status_code, 400)
 
     def test_user_activation_wrong_token(self):
         token = f"{urlsafe_base64_encode(force_bytes(self.user.email))}.something"
-        resp = self.client.post(reverse('authentication:auth-activate'), data={'token': token})
+        resp = self.client.post(reverse('v1:authentication:auth-activate'), data={'token': token})
         self.assertEqual(resp.status_code, 400)
